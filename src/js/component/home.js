@@ -32,6 +32,7 @@ export function Home() {
 		return (
 			<li className="ul" key={i} onClick={() => deleteToDo(i)}>
 				{listItems.label}
+				<span className="izq fas fa-times"></span>
 			</li>
 		);
 	});
@@ -93,7 +94,27 @@ export function Home() {
 	}
 	function deleteToDo(i) {
 		let borrar = frases.filter(item => item !== frases[i]);
-		setFrase(borrar);
+		//setFrase(borrar);
+		if (borrar.length == 0) {
+			eliminaralltodo();
+		} else {
+			setFrase(borrar);
+		}
+	}
+	function eliminaralltodo() {
+		var requestOptions = {
+			method: "DELETE",
+			redirect: "follow"
+		};
+
+		fetch(
+			"https://assets.breatheco.de/apis/fake/todos/user/cris010411",
+			requestOptions
+		)
+			.then(response => response.json())
+			.then(result => console.log(""))
+			.catch(error => console.log("error", error));
+		setFrase([]);
 	}
 
 	return (
