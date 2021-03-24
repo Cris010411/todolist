@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 //include images into your bundle
 import rigoImage from "../../img/rigo-baby.jpg";
@@ -8,6 +8,25 @@ export function Home() {
 	let [frases, setFrase] = useState([]);
 
 	let [tarea, setTarea] = useState("");
+	useEffect(() => {
+		// Actualiza el título del documento usando la API del navegador
+		getlist();
+	}, []);
+
+	const getlist = async () => {
+		var fetchurl =
+			"https://assets.breatheco.de/apis/fake/todos/user/cris010411";
+		await fetch(fetchurl)
+			.then(response => response.json())
+			.then(result => {
+				setFrase(
+					result.map(items => {
+						return { label: items.label, done: items.done };
+					})
+				);
+			})
+			.catch(error => console.log("error", error));
+	};
 
 	const updatedtoDo = frases.map((listItems, i) => {
 		return (
@@ -25,14 +44,14 @@ export function Home() {
 			actualizar(frases);
 		}
 	}
-	function actualizar(frases) {
+	function insertarpost() {
 		var myHeaders = new Headers();
 		myHeaders.append("Content-Type", "application/json");
 
-		var raw = JSON.stringify(frases);
+		var raw = JSON.stringify([frases]);
 
 		var requestOptions = {
-			method: "PUT",
+			method: "POST",
 			headers: myHeaders,
 			body: raw,
 			redirect: "follow"
@@ -43,14 +62,34 @@ export function Home() {
 			requestOptions
 		)
 			.then(response => response.text())
-			.then(result =>
-				setTarea(
-					result.map(item => {
-						return { label: item.label, done: item.done };
-					})
-				)
-			)
+			.then(result => console.log(result))
 			.catch(error => console.log("error", error));
+	}
+
+	function actualizar(frases) {
+		if (frases.length > 0) {
+			var myHeaders = new Headers();
+			myHeaders.append("Content-Type", "application/json");
+
+			var raw = JSON.stringify(frases);
+
+			var requestOptions = {
+				method: "PUT",
+				headers: myHeaders,
+				body: raw,
+				redirect: "follow"
+			};
+
+			fetch(
+				"https://assets.breatheco.de/apis/fake/todos/user/cris010411",
+				requestOptions
+			)
+				.then(response => response.json())
+				.then(result => console.log(result))
+				.catch(error => console.log("error", error));
+		} else if (frases.length <= 0 && tarea != "") {
+			insertarpost();
+		}
 	}
 	function deleteToDo(i) {
 		let borrar = frases.filter(item => item !== frases[i]);
